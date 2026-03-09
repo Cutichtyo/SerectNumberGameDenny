@@ -298,11 +298,12 @@ let name = document.getElementById("playerName").value
 
 let {data,error} = await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
-.select("id,streak")
+.select("*")
 .eq("name",name)
-.single()
+.order("streak",{ascending:false})
+.limit(1)
 
-if(!data){
+if(!data || data.length === 0){
 
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
@@ -310,12 +311,14 @@ await supabaseClient
 
 }else{
 
-let newStreak = (data.streak || 0) + 1
+let player = data[0]
+
+let newStreak = (player.streak || 0) + 1
 
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
 .update({streak:newStreak})
-.eq("id",data.id)
+.eq("id",player.id)
 
 }
 
@@ -329,16 +332,17 @@ let name = document.getElementById("playerName").value
 
 let {data} = await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
-.select("id")
+.select("*")
 .eq("name",name)
-.single()
+.order("streak",{ascending:false})
+.limit(1)
 
-if(data){
+if(data && data.length > 0){
 
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
 .update({streak:0})
-.eq("id",data.id)
+.eq("id",data[0].id)
 
 }
 
@@ -384,3 +388,4 @@ div.appendChild(row)
 
 
 loadLeaderboard()
+
