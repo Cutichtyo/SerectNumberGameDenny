@@ -296,12 +296,13 @@ async function saveWin(){
 
 let name = document.getElementById("playerName").value
 
-let {data} = await supabaseClient
+let {data,error} = await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
-.select("*")
+.select("id,streak")
 .eq("name",name)
+.single()
 
-if(data.length === 0){
+if(!data){
 
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
@@ -309,12 +310,12 @@ await supabaseClient
 
 }else{
 
-let newStreak = data[0].streak + 1
+let newStreak = (data.streak || 0) + 1
 
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
 .update({streak:newStreak})
-.eq("name",name)
+.eq("id",data.id)
 
 }
 
@@ -326,10 +327,20 @@ async function saveLose(){
 
 let name = document.getElementById("playerName").value
 
+let {data} = await supabaseClient
+.from(CONFIG.LEADERBOARD_TABLE)
+.select("id")
+.eq("name",name)
+.single()
+
+if(data){
+
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
 .update({streak:0})
-.eq("name",name)
+.eq("id",data.id)
+
+}
 
 loadLeaderboard()
 
@@ -370,5 +381,6 @@ div.appendChild(row)
 }
 
 /* ================= INIT ================= */
+
 
 loadLeaderboard()
