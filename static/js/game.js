@@ -296,18 +296,16 @@ async function saveWin(){
 
 let name = document.getElementById("playerName").value
 
-let {data,error} = await supabaseClient
+let { data } = await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
 .select("*")
-.eq("name",name)
-.order("streak",{ascending:false})
-.limit(1)
+.eq("name", name)
 
 if(!data || data.length === 0){
 
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
-.insert([{name:name,streak:1}])
+.insert([{name:name, streak:1}])
 
 }else{
 
@@ -318,7 +316,7 @@ let newStreak = (player.streak || 0) + 1
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
 .update({streak:newStreak})
-.eq("id",player.id)
+.eq("id", player.id)
 
 }
 
@@ -330,19 +328,17 @@ async function saveLose(){
 
 let name = document.getElementById("playerName").value
 
-let {data} = await supabaseClient
+let { data } = await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
 .select("*")
-.eq("name",name)
-.order("streak",{ascending:false})
-.limit(1)
+.eq("name", name)
 
 if(data && data.length > 0){
 
 await supabaseClient
 .from(CONFIG.LEADERBOARD_TABLE)
 .update({streak:0})
-.eq("id",data[0].id)
+.eq("id", data[0].id)
 
 }
 
@@ -388,4 +384,5 @@ div.appendChild(row)
 
 
 loadLeaderboard()
+
 
